@@ -17,16 +17,21 @@ class DopePoseProcessing:
 
         cracker, gelatin, meat, mustard, soup, sugar
         '''
+        self.object_poses = {}
         self.object_pose_subscribers = {}
+        self.object_pose_publishers = {}
         base_topic = "/dope/pose_"
         for object_name in object_names:
+            self.object_poses[object_name] = None
+
             sub = rospy.Subscriber(
                 base_topic + object_name, PoseStamped, self.pose_callback, object_name)
             self.object_pose_subscribers[object_name] = sub
 
-        self.object_poses = {}
-        for object_name in object_names:
-            self.object_poses[object_name] = None
+            pub = rospy.Publisher(
+                "/transformed_pose_" + object_name, PoseStamped, queue_size = 10)
+            self.object_pose_publishers[object_name] = pub
+
 
     def transform_dope_pose(self, dope_pose):
         dope_pose_matrix = np.eye(4)
@@ -65,17 +70,18 @@ class DopePoseProcessing:
         new_pose.pose.orientation.z = q[2]
         new_pose.pose.orientation.w = q[3]
 
-        pub = rospy.Publisher("/transformed_pose", PoseStamped, 10)
-        pub.publish(new_pose)
+
+        self.object_pose_publishers[object_name].publish(new_pose)
 
 
 if __name__ == "__main__":
     rospy.init_node("dope_pose_processing")
 
-    object_names = ["mustard"]
+    object_names = ["mustard", "soup", "meat", "cracker", "gelatin"]
     dope_pose_processing = DopePoseProcessing(object_names)
 
-    while not rospy.is_shutdown():
-        print dope_pose_processing.object_poses["mustard"]
-        rospy.sleep(1.0)
-        # rospy.spin()
+    rospy.spin()
+    # while not rospy.is_shutdown():
+    #     print dope_pose_processing.object_poses["mustard"]
+    #     rospy.sleep(1.0)
+    #     # rospy.spin()
