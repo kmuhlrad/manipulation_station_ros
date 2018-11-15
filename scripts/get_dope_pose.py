@@ -44,9 +44,9 @@ class DopePoseProcessing:
 
         flip_x_z = tf_conversions.transformations.euler_matrix(-1.5707963267948966, -0.0, -1.5707963267948966)
 
-        R = tf_conversions.transformations.euler_matrix(1.65259, 0.223617, 0.476623)
+        R = tf_conversions.transformations.euler_matrix(1.7016, 0.190511, 0.435592)
         R = np.dot(R, flip_x_z)
-        R[:3, 3] = [-0.206765, -0.469184, 0.48013]
+        R[:3, 3] = [-0.189879, -0.452236, 0.485716]
 
         return R.dot(dope_pose_matrix)
 

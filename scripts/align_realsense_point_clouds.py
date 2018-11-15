@@ -11,12 +11,6 @@ from sensor_msgs.msg import PointCloud2
 class AlignPointClouds:
 
     def __init__(self):
-        '''
-        object_names only supports the following strings:
-
-        cracker, gelatin, meat, mustard, soup, sugar
-        '''
-
         self.left_pc_sub = rospy.Subscriber(
             "/cam_left/depth/color/points", PointCloud2, self.left_pc_callback)
         self.middle_pc_sub = rospy.Subscriber(
@@ -57,27 +51,27 @@ class AlignPointClouds:
         return transformed_msg
 
     def left_pc_callback(self, msg):
-        R = tf_conversions.transformations.euler_matrix(-1.67937, 0.209218, -0.449982)
+        R = tf_conversions.transformations.euler_matrix(-1.63957, 0.126963, -0.700476)
         R = np.dot(R, self._flip_x_z)
-        R[:3, 3] = [-0.226819, 0.459576, 0.482885]
+        R[:3, 3] = [-0.153719, 0.472307, 0.46145]
 
         transformed_msg = self._numpy_conversion_and_alignment(R, msg)
 
         self.aligned_left_pc_pub.publish(transformed_msg)
 
     def middle_pc_callback(self, msg):
-        R = tf_conversions.transformations.euler_matrix(-0.0851225, 1.20071, 3.05952)
+        R = tf_conversions.transformations.euler_matrix(0.0159614, 1.04205, 3.12068)
         R = np.dot(R, self._flip_x_z)
-        R[:3, 3] = [0.787323, -0.0186122, 1.01686]
+        R[:3, 3] = [0.827948, -0.04465, 1.04649]
 
         transformed_msg = self._numpy_conversion_and_alignment(R, msg)
 
         self.aligned_middle_pc_pub.publish(transformed_msg)
 
     def right_pc_callback(self, msg):
-        R = tf_conversions.transformations.euler_matrix(1.65259, 0.223617, 0.476623)
+        R = tf_conversions.transformations.euler_matrix(1.7016, 0.190511, 0.435592)
         R = np.dot(R, self._flip_x_z)
-        R[:3, 3] = [-0.206765, -0.469184, 0.48013]
+        R[:3, 3] = [-0.189879, -0.452236, 0.485716]
 
         transformed_msg = self._numpy_conversion_and_alignment(R, msg)
 
