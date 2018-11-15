@@ -44,7 +44,7 @@ class DopePoseProcessing:
 
         flip_x_z = tf_conversions.transformations.euler_matrix(-1.5707963267948966, -0.0, -1.5707963267948966)
 
-        R = tf_conversions.transformations.euler_matrix(1.65259 0.223617 0.476623)
+        R = tf_conversions.transformations.euler_matrix(1.65259, 0.223617, 0.476623)
         R = np.dot(R, flip_x_z)
         R[:3, 3] = [-0.206765, -0.469184, 0.48013]
 
@@ -73,15 +73,32 @@ class DopePoseProcessing:
 
         self.object_pose_publishers[object_name].publish(new_pose)
 
+    def write_poses_to_file(self, filename):
+        with open(filename, "wb") as f:
+            for object_name in self.object_poses:
+                f.write(object_name + "\n")
+                f.write(str(self.object_poses[object_name]) + "\n")
+
 
 if __name__ == "__main__":
     rospy.init_node("dope_pose_processing")
 
-    object_names = ["mustard", "soup", "meat", "cracker", "gelatin"]
+    # object_names = ["mustard", "soup", "meat", "cracker", "gelatin"]
+    object_names = ["mustard", "soup"]
     dope_pose_processing = DopePoseProcessing(object_names)
 
-    rospy.spin()
-    # while not rospy.is_shutdown():
-    #     print dope_pose_processing.object_poses["mustard"]
-    #     rospy.sleep(1.0)
-    #     # rospy.spin()
+    # rospy.spin()
+    rospy.sleep(10.0)
+
+    while not rospy.is_shutdown():
+        all_seen = True
+        for object_name in object_names:
+            if dope_pose_processing.object_poses[object_name] is None:
+                all_seen = False
+        if all_seen:
+            dope_pose_processing.write_poses_to_file("dope_poses.txt")
+            break
+        rospy.sleep(1.0)
+        # rospy.spin()
+
+    print "done"
